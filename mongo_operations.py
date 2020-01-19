@@ -28,5 +28,3 @@ def augment_and_insert(transcript):
     sentiment_polarity = calculate_sentiment_polarity(transcript)
     emoji = emoji_mapper(sentiment_polarity)
     insert(transcript, sentiment_polarity, emoji)
-
-find()

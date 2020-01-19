@@ -74,7 +74,7 @@ def listen_for_speech(threshold=THRESHOLD, num_phrases=2):
     print(rel)
     print(SILENCE_LIMIT * rel)
     slid_win = deque(maxlen=int(SILENCE_LIMIT * rel))
-    #Prepend audio from 0.5 seconds before noise was detected
+    # Prepend audio from 0.5 seconds before noise was detected
     prev_audio = deque(maxlen=int(PREV_AUDIO * rel))
     started = False
     n = num_phrases
@@ -86,31 +86,26 @@ def listen_for_speech(threshold=THRESHOLD, num_phrases=2):
         slid_win.append(math.sqrt(abs(audioop.avg(cur_data, 4))))
         if(sum([x > THRESHOLD for x in slid_win]) > 0):
             if(not started):
-                # print "Starting record of phrase"
+                # Starting record of phrase
                 started = True
             audio2send.append(cur_data)
         elif (started is True):
-            # print "Finished"
             # The limit was reached, finish capture and deliver.
             filename = save_speech(list(prev_audio) + audio2send, p)
             transcript = speech_recognize_continuous_from_file(filename)
             print(transcript[index])
             augment_and_insert(transcript[index])
             index = index+1
-            # append_transcript(text)
-            # print('--------------------')
-            # print(text)
-            # filename = save_speech(audio2send, p)
             started = False
             slid_win = deque(maxlen=int(SILENCE_LIMIT * rel))
             prev_audio = deque(maxlen=int(0.5 * rel))
             audio2send = []
             n -= 1
-            # print "Listening ..."
+            # Listening ...
         else:
             prev_audio.append(cur_data)
 
-    # print "* Done recording"
+    # Done recording
     stream.close()
     p.terminate()
 
