@@ -2,6 +2,8 @@ import azure.cognitiveservices.speech as speechsdk
 import os.path
 import time
 import wave
+from mongo_operations import augment_and_insert
+from datetime import datetime
 
 transcript_list = []
 
@@ -14,12 +16,14 @@ def getRecognized(evt):
     # print(transcript)
     return transcript_list
 
-def speech_recognize_continuous_from_file(audio_filename):
+def speech_recognize_continuous_from_file(audio_filename, index):
     # audio_filename = "microphone_audio/output_1579388897.wav"
     if os.path.isfile(audio_filename):
         print ("File exist")
     else:
         print ("File not exist")
+    now = datetime.now()
+    date_time = now.strftime("%m/%d/%Y|%H:%M:%S")
 
     """performs continuous speech recognition with input from an audio file"""
     # <SpeechContinuousRecognitionWithFile>
@@ -53,5 +57,14 @@ def speech_recognize_continuous_from_file(audio_filename):
     speech_recognizer.start_continuous_recognition()
     while not done:
         time.sleep(.5)
+    if done:
+        # time.sleep(1)
+        for i in range(10):
+            if len(transcript_list) < index+1:
+                time.sleep(.5)
+            else:
+                augment_and_insert(transcript_list[index], date_time)
+                break
     # print(transcript_list)
-    return transcript_list
+    # return transcript_list
+
